@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project1/home.dart';
 
 Future<bool?> signin(String email, String password) async {
   try {
@@ -67,6 +69,7 @@ Future<bool?> updateuser(String age,String name,String url) async {
       'name': name,
       'age': age,
       'url': url,
+      'uid': uid,
     })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
@@ -139,6 +142,25 @@ catch(e){
 }
 }
 
+//String nameeee = 'usama';
+
+// Future getUserListee() async {
+//
+//   List itemsList = [];
+//
+//   try{
+//     CollectionReference users = FirebaseFirestore.instance.collection('users');
+//     await users.get().then((QuerySnapshot) {
+//       QuerySnapshot.docs.where((element) => 'name' == nameeee).forEach((element) {
+//         itemsList.add(element.data());
+//       });
+//     });
+//     return itemsList;
+//   }
+//   catch(e){
+//     print(e);
+//   }
+// }
 
 
 Future updateProfile(String name,String age) async {
@@ -156,6 +178,7 @@ Future updateProfile(String name,String age) async {
     print(e.toString());
   }
 }
+
 
 
 /*Future<void> uploadFile(String filePath) async {

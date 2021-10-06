@@ -1,12 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project1/animation.dart';
 import 'package:project1/authentication/authservice.dart';
 import 'package:project1/home.dart';
 import 'package:project1/registraion.dart';
 
 class Authentication extends StatefulWidget {
   //const Authentication({Key? key}) : super(key: key);
-
+  static String id = 'authentication';
 
   @override
   _AuthenticationState createState() => _AuthenticationState();
@@ -14,8 +15,11 @@ class Authentication extends StatefulWidget {
 
 class _AuthenticationState extends State<Authentication> {
 
+
+
   TextEditingController _emailField = TextEditingController();
   TextEditingController _passwordField = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +82,7 @@ class _AuthenticationState extends State<Authentication> {
                   bool? shouldNavigate = await register(_emailField.text, _passwordField.text);
                   if(shouldNavigate!){
                     //navigate
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationForm()));
+                    Navigator.push(context, BouncyPageRoute(widget: RegistrationForm()));
                     print('registerd successfully');
                   }
                 },
@@ -98,7 +102,7 @@ class _AuthenticationState extends State<Authentication> {
                     bool? shouldNavigate = await signin(_emailField.text, _passwordField.text);
                     if(shouldNavigate!){
                       //navigate
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Home_screen()));
+                      Navigator.push(context, BouncyPageRoute(widget: Home_screen()));
                       print('logged in successfully');
                     }
                   },

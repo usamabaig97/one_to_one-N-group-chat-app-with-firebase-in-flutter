@@ -1,3 +1,4 @@
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class _Home_screenState extends State<Home_screen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
-  late User _user;
+ // late User _user;
 
   bool isLoading = false;
 
@@ -32,6 +33,8 @@ class _Home_screenState extends State<Home_screen>
 
   List userProfileList = [];
   List _foundUser = [];
+  List gusers = [];
+  List pusersNgusers = [];
 
   @override
   void initState() {
@@ -46,11 +49,21 @@ class _Home_screenState extends State<Home_screen>
     }
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+
   }
 
 
 
   fetchdatabaseList() async {
+    dynamic gresultant = await getGroupsList();
+    if(gresultant == null){
+      print('unable to get group data');
+    } else{
+      setState(() {
+        gusers = gresultant;
+       // print(gusers);
+      });
+    }
     dynamic resultant = await getUserList();
     if (resultant == null) {
       print('Unable to get data bb');
@@ -60,9 +73,11 @@ class _Home_screenState extends State<Home_screen>
         _foundUser = userProfileList;
         //  print(userProfileList);
         // print(resultant);
-        print(_foundUser);
+      //  print(_foundUser);
       });
     }
+    pusersNgusers = gusers + _foundUser;
+    print(pusersNgusers);
   }
 
   @override
@@ -128,7 +143,7 @@ class _Home_screenState extends State<Home_screen>
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      itemCount: _foundUser.length,
+                      itemCount: pusersNgusers.length,
                       itemBuilder: (context, index) {
                         return _listIteme(index);
                       }),
@@ -146,13 +161,17 @@ class _Home_screenState extends State<Home_screen>
     );
   }
 
-  String? peerid;
-  String? userName;
-  String? peerAvatar;
+  String pid ='emmpty peer id';
+  String userName = 'name not available';
+  String peerAvatar = 'peer avatar not available';
+  String groupId = 'gid not available';
+  String type = '';
+
+
 
   _listIteme(index) {
     return SlideAnimation(
-      itemCount: _foundUser.length,
+      itemCount: pusersNgusers.length,
       position: index,
       slideDirection: SlidDirection.fromBottom,
       animationController: _animationController,
@@ -160,21 +179,38 @@ class _Home_screenState extends State<Home_screen>
         color: Colors.white,
         child: ListTile(
           onTap: () {
-            peerAvatar = _foundUser[index]['url'];
-            peerid = _foundUser[index]['uid'];
-            userName = _foundUser[index]['name'];
-            Navigator.push(
-                context,
-                BouncyPageRoute(
-                    widget: Chat_screen(userName!, peerAvatar!, peerid!)));
-            print(peerid);
+
+              peerAvatar = pusersNgusers[index]['url'];
+              userName = pusersNgusers[index]['name'];
+
+             if(pusersNgusers[index]['type'] == '1'){
+               setState(() {
+                 pid = '';
+                 type = '1';
+                 groupId =  pusersNgusers[index]['gid'];
+               });
+
+               Navigator.push(context, BouncyPageRoute(widget: Chat_screen(userName, peerAvatar, pid, type, groupId)));
+             }
+             else {
+               setState(() {
+                 groupId = '';
+                 type = '0';
+                 pid = pusersNgusers[index]['uid'];
+               });
+
+               Navigator.push(context, BouncyPageRoute(widget: Chat_screen(userName, peerAvatar, pid, type, groupId)));
+             }
+
+            print(pid);
             print(userName);
+            print(groupId);
           },
           leading: CircleAvatar(
-            backgroundImage: NetworkImage('${_foundUser[index]['url']}'),
+            backgroundImage: NetworkImage('${pusersNgusers[index]['url']}'),
           ),
-          title: Text('${_foundUser[index]['name']}'),
-          subtitle: Text('${_foundUser[index]['age']}'),
+          title: Text('${pusersNgusers[index]['name']}'),
+          subtitle: Text('${pusersNgusers[index]['age']}'),
         ),
       ),
     );
@@ -196,4 +232,5 @@ class _Home_screenState extends State<Home_screen>
       _foundUser = resultce;
     });
   }
+
 }

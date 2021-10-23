@@ -142,6 +142,25 @@ catch(e){
 }
 }
 
+Future getGroupsList() async {
+
+  List itemsList = [];
+
+  try{
+    CollectionReference users = FirebaseFirestore.instance.collection('groups');
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    await users.where('members', arrayContains: uid).get().then((QuerySnapshot) {
+      QuerySnapshot.docs.forEach((element) {
+        itemsList.add(element.data());
+      });
+    });
+    return itemsList;
+  }
+  catch(e){
+    print(e);
+  }
+}
+
 //String nameeee = 'usama';
 
 // Future getUserListee() async {

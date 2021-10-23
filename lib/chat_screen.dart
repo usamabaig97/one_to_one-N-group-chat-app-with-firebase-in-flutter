@@ -7,7 +7,9 @@ class Chat_screen extends StatefulWidget {
   final String userName;
   final String peerid;
   final String peerAvatar;
-  const Chat_screen(this.userName, this.peerAvatar, this.peerid, {Key? key})
+  final String type;
+  final String groupId;
+  const Chat_screen(this.userName, this.peerAvatar, this.peerid,this.type, this.groupId, {Key? key})
       : super(key: key);
 
   @override
@@ -17,14 +19,18 @@ class Chat_screen extends StatefulWidget {
 class _Chat_screenState extends State<Chat_screen> {
   TextEditingController mcontroller = TextEditingController();
 
-  List<QueryDocumentSnapshot> listMessage = new List.from([]);                       //copied line
+  List<QueryDocumentSnapshot> listMessage = new List.from([]);                      //copied line
   int _limit = 20;
-  int _limitIncrement = 20;
+
   String? id;
   late String peerId;
   String message = '';
 
-// late List listmessage;
+  String? type;
+  String? groupId;
+  String? peerAvatar;
+
+
 
   String? groupChatId;
 
@@ -32,15 +38,28 @@ class _Chat_screenState extends State<Chat_screen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    type = widget.type;
      peerId = widget.peerid;
+     groupId = widget.groupId;
+     peerAvatar = widget.peerAvatar;
+
     String uid = FirebaseAuth.instance.currentUser!.uid;
     id = uid;
-    if (uid.hashCode <= peerId.hashCode) {
-      groupChatId = '$uid-$peerId';
-    } else {
-      groupChatId = '$peerId-$uid';
+
+    if(peerId == ''){
+      groupChatId = groupId;
+      peerAvatar = '';
+    }else {
+      if (uid.hashCode <= peerId.hashCode) {
+        groupChatId = '$uid-$peerId';
+      } else {
+        groupChatId = '$peerId-$uid';
+      }
     }
     print(groupChatId);
+    print(type);
+    print(groupId);
   }
 
   @override
@@ -54,7 +73,7 @@ class _Chat_screenState extends State<Chat_screen> {
           IconButton(
             onPressed: null,
             icon: CircleAvatar(
-              backgroundImage: NetworkImage(widget.peerAvatar),
+              backgroundImage: NetworkImage(peerAvatar!),
             ),
           )
         ],
@@ -143,7 +162,7 @@ class _Chat_screenState extends State<Chat_screen> {
                   isLastMessageLeft(index)
                       ? Material(
                     child: Image.network(
-                      widget.peerAvatar,
+                      peerAvatar!,
                       loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
@@ -256,6 +275,7 @@ class _Chat_screenState extends State<Chat_screen> {
   }
   void onSendMessage(String content) {
     if (content.trim() != '') {
+
       mcontroller.clear();
 
       var documentReference = FirebaseFirestore.instance
@@ -272,7 +292,7 @@ class _Chat_screenState extends State<Chat_screen> {
             'idTo': peerId,
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'content': content,
-           // 'type': type
+            'type': type,
           },
         );
       });
